@@ -1,0 +1,128 @@
+What is PersistentVolume (PV)?
+A PersistentVolume (PV) is a cluster-level storage resource. It represents a piece of storage 
+(e.g., local disk, NFS, cloud storage) provisioned by an administrator or dynamically by a
+storage class.
+
+Key Attributes of PVs:
+-----------------------
+Independent of pods.
+Managed by Kubernetes.
+Defined by capacity, access modes, and storage type.
+
+What is PersistentVolumeClaim (PVC)?
+A PersistentVolumeClaim (PVC) is a request for storage by a pod. PVCs are tied to specific storage 
+requirements such as size, access mode, and storage class.
+
+How PVC Works:
+---------------
+A pod declares its storage needs using a PVC.
+Kubernetes matches the PVC to an available PV that satisfies the claim.
+Once bound, the PVC can be used as a volume in a pod.
+
+How PV and PVC Work Together
+------------------------------
+Define a PersistentVolume (PV):
+
+Represents actual storage (e.g., NFS, local storage, cloud disk).
+Create a PersistentVolumeClaim (PVC):
+A request for specific storage attributes (e.g., size, access modes).
+Bind PVC to PV:
+Kubernetes binds the PVC to a matching PV.
+Mount PVC in a Pod:
+The PVC is referenced in the pod's spec, and storage is mounted.
+
+Access Modes:
+-------------
+ReadWriteOnce (RWO): Mounted as read-write by a single node.
+ReadOnlyMany (ROX): Mounted as read-only by many nodes.
+ReadWriteMany (RWX): Mounted as read-write by many nodes.
+
+example for pv:
+---------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-example
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: custom-class
+  hostPath:
+    path: /mnt/data
+
+commands:
+---------
+to create a pv
+--> kubectl create -f pv.yaml
+to get the created pv list
+--> kubectl get pv
+to describe pv
+-->kubectl describe pv pv-name
+to delete the pv
+--> kubectl delete pv pv-name
+
+persistentVolumeReclaimPolicy:
+------------------------------
+Retain: Retain the data after the PVC is deleted.
+Recycle: Clear data and make it available again.
+Delete: Delete the storage when the PVC is deleted.
+
+example for pvc:
+-----------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-example
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: custom-class
+
+commands:
+---------
+to create pvc
+-->kubectl create -f pvc.yaml
+to list the pvc
+--> kubectl get pvc
+to describe pvc
+-->kubectl describe pvc pvc-name
+to delete the pvc
+-->kubectl delete pvc pvc-name
+
+use pvc in a pod:
+------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: storage-volume
+  volumes:
+  - name: storage-volume
+    persistentVolumeClaim:
+      claimName: pvc-example
+  
+
+volumeMounts: Mounts the PVC to the specified directory in the container (/usr/share/nginx/html).
+persistentVolumeClaim.claimName: References the PVC created earlier.
+
+Storage Class:
+The StorageClass in Kubernetes defines the storage provisioning strategy for your cluster.
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
