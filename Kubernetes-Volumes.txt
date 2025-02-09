@@ -1,0 +1,60 @@
+Kubernetes Volumes
+------------------
+A volume in Kubernetes is a directory accessible to containers running in a pod.
+when a container restarts or the pod is terminated the data will be lost.
+volumes provide a way to persist data, share data between containers, or attach external storage to a pod.
+
+Why Use Volumes?
+----------------
+1.Data Persistence: Store data that survives container restarts or pod recreation.
+2.Data Sharing: Share data between multiple containers within the same pod.
+3.External Storage: Attach external storage (e.g., cloud-based disks, NFS, or object stores) to Kubernetes pods.
+
+Types of Volumes in Kubernetes
+1.emptyDir:
+-----------
+A temporary directory that is created when a pod is assigned to a node and exists as long as the pod runs.
+Data is deleted when the pod is terminated.
+Use Case: Temporary storage for data shared between containers in the same pod.
+
+example:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: emptydir-pod
+  labels:
+    app: frontend
+spec:
+  containers:
+  - name: app
+    image: nginx
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: temp-storage
+  volumes:
+  - name: temp-storage
+    emptyDir: {}
+
+2.hostPath:
+------------
+Mounts a file or directory from the host node's filesystem into the pod.
+Useful for accessing specific files on the node.
+Use Case: Accessing system logs or shared files on the host.
+
+example:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostpath-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: host-volume
+  volumes:
+  - name: host-volume
+    hostPath:
+      path: /data
+
