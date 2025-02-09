@@ -1,0 +1,29 @@
+NAMESPACES IN KUBERNETES
+-------------------------
+A namespace in Kubernetes is a virtual cluster or a logical partition within a Kubernetes cluster. 
+It provides a mechanism to isolate resources like pods, services, and deployments within the same physical cluster. 
+Namespaces are especially useful in multi-tenant environments or when you want to manage different environments 
+(e.g., development, testing, production) within the same cluster.
+
+KEY FEATURES:
+--------------
+1.Isolation: Namespaces segregate resources, ensuring that resources in one namespace do not interfere with those in another.
+2.Scoping: Objects like pods and services are scoped to a namespace. Each namespace has its own set of resources and configurations.
+3.Resource Quotas: You can set resource quotas for namespaces to limit the amount of CPU, memory, and storage that can be consumed.
+4.Access Control: Role-Based Access Control (RBAC) can be applied at the namespace level to restrict access to specific users or teams.
+
+
+Commands to Work with Namespaces
+--------------------------------
+1. List All Namespaces
+-->kubectl get namespaces
+2. Create a Namespace
+-->kubectl create namespace my-namespace
+3. Delete a Namespace
+-->kubectl delete namespace my-namespace
+4. Apply a Resource in a Specific Namespace
+-->kubectl apply -f my-resource.yaml -n my-namespace
+5. Switch Context to a Specific Namespace
+-->kubectl config set-context --current --namespace=my-namespace
+6. View Resources in a Namespace
+-->kubectl get pods -n my-namespace
